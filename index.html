@@ -1,133 +1,116 @@
-<!DOCTYPE html><html lang="en">
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Convert your text into bold, italic, and stylish Unicode fonts for Facebook, Instagram, Twitter (X), LinkedIn, and more. Use Markdown formatting and transform your content in one click.">
-  <title>Stylish Unicode Text Generator — Facebook, Instagram, X</title>
-  <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Convert Markdown-formatted text to stylish Unicode text for Facebook, Instagram, X, and more." />
+  <title>Stylish Unicode Text Generator</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 2rem;
-      background: #f5f5f5;
+      padding: 1rem;
+      background-color: #f9f9f9;
     }
     h1 {
       text-align: center;
     }
-    .editor-container {
-      max-width: 800px;
-      margin: auto;
-    }
-    .button-group {
-      margin-top: 1rem;
+    #container {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       gap: 1rem;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+    }
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
     }
     button {
       padding: 0.5rem 1rem;
       font-size: 1rem;
       border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #generateBtn {
+      border-radius: 6px;
       background-color: #007bff;
       color: white;
+      cursor: pointer;
     }
-    #editBtn {
-      background-color: #6c757d;
-      color: white;
+    button:hover {
+      background-color: #0056b3;
     }
-    #copyBtn {
-      background-color: #28a745;
-      color: white;
+    @media (min-width: 768px) {
+      #container {
+        flex-direction: row;
+      }
     }
   </style>
 </head>
 <body>
   <h1>Stylish Unicode Text Generator</h1>
-  <div class="editor-container">
-    <textarea id="editor"></textarea>
-    <div class="button-group">
-      <button id="generateBtn">Generate Unicode Text</button>
-      <button id="editBtn" style="display:none;">Edit Markdown</button>
-      <button id="copyBtn" style="display:none;">Copy Text</button>
-    </div>
-  </div>  <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>  <script>
+  <div id="container">
+    <textarea id="textArea" placeholder="Type or paste your **Markdown** styled text here..."></textarea>
+  </div>
+  <div class="buttons">
+    <button onclick="generateUnicode()">Generate Unicode Text</button>
+    <button id="copyBtn" onclick="copyText()" style="display:none;">Copy Text</button>
+    <button onclick="toggleEdit()">Edit Markdown</button>
+  </div>
+
+  <script>
+    let originalText = "";
     let isGenerated = false;
-    const editorEl = document.getElementById("editor");
-    const generateBtn = document.getElementById("generateBtn");
-    const copyBtn = document.getElementById("copyBtn");
-    const editBtn = document.getElementById("editBtn");
 
-    const easyMDE = new EasyMDE({
-      element: editorEl,
-      placeholder: "Type or paste your text using italic, *bold*, etc.",
-      spellChecker: false,
-      toolbar: ["bold", "italic", "strikethrough", "code", "undo", "redo"],
-    });
-
-    function parseMarkdownToUnicode(text) {
+    const markdownToUnicode = (text) => {
       return text
-        .replace(/\\(.?)\\*/g, (_, t) => toBold(t))
-        .replace(/_(.*?)/g, (, t) => toBold(t))
-        .replace(/\(.?)\*/g, (_, t) => toItalic(t))
-        .replace(/(.*?)/g, (_, t) => toItalic(t))
-        .replace(/~(.*?)~/g, (_, t) => toStrikethrough(t));
-    }
+        .replace(/\*\*(.*?)\*\*/g, (_, word) => word.split('').map(char => toBold(char)).join(''))
+        .replace(/\*(.*?)\*/g, (_, word) => word.split('').map(char => toItalic(char)).join(''));
+    };
 
-    function toBold(text) {
-      const normal = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-      const bold = '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙' +
-                   '𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳';
-      return [...text].map(c => {
-        const i = normal.indexOf(c);
-        return i !== -1 ? bold[i] : c;
-      }).join('');
-    }
+    const toBold = (c) => {
+      const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      const bold = '𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇';
+      return base.includes(c) ? bold[base.indexOf(c)] : c;
+    };
 
-    function toItalic(text) {
-      const normal = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-      const italic = '𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍' +
-                     '𝑎𝑏𝑐𝑑𝑒𝑓𝑔ℎ𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧';
-      return [...text].map(c => {
-        const i = normal.indexOf(c);
-        return i !== -1 ? italic[i] : c;
-      }).join('');
-    }
+    const toItalic = (c) => {
+      const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      const italic = '𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍𝑎𝑏𝑐𝑑𝑒𝑓𝑔ℎ𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧';
+      return base.includes(c) ? italic[base.indexOf(c)] : c;
+    };
 
-    function toStrikethrough(text) {
-      return [...text].map(c => c + '\u0336').join('');
-    }
-
-    generateBtn.onclick = () => {
-      const raw = easyMDE.value();
-      const converted = parseMarkdownToUnicode(raw);
-      easyMDE.toTextArea();
-      editorEl.value = converted;
-      editorEl.setAttribute("readonly", true);
-      generateBtn.style.display = "none";
-      copyBtn.style.display = "inline-block";
-      editBtn.style.display = "inline-block";
+    function generateUnicode() {
+      const area = document.getElementById('textArea');
+      originalText = area.value;
+      const converted = markdownToUnicode(originalText);
+      area.value = converted;
+      document.getElementById('copyBtn').style.display = 'inline-block';
       isGenerated = true;
-    };
+    }
 
-    copyBtn.onclick = () => {
-      editorEl.select();
+    function copyText() {
+      const area = document.getElementById('textArea');
+      area.select();
       document.execCommand('copy');
-    };
+      alert('Text copied to clipboard!');
+    }
 
-    editBtn.onclick = () => {
+    function toggleEdit() {
       if (isGenerated) {
-        editorEl.removeAttribute("readonly");
-        easyMDE.codemirror.setValue("");
-        easyMDE.toTextArea();
-        easyMDE.codemirror.setValue("");
-        easyMDE.value('');
-        location.reload();
+        document.getElementById('textArea').value = originalText;
+        document.getElementById('copyBtn').style.display = 'none';
+        isGenerated = false;
       }
-    };
-  </script></body>
+    }
+  </script>
+</body>
 </html>
